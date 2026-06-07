@@ -1,2 +1,54 @@
 /* For information on how to create your own theme, please refer to:
 http://ionicframework.com/docs/theming/ */
+
+/* ─── Input field visual clarity ─────────────────────────────────────────────
+   Problem: placeholder text and typed text looked nearly identical in size/colour,
+   making it hard to tell whether a field was filled.
+
+   Fix:
+   • Placeholder  → light grey (#a0a0a0) + italic — clearly a hint, not data
+   • Typed text   → uses default ion-text-color (dark in light mode, light in dark)
+   • Stacked label → small caps, primary colour — clearly a field label
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Ionic IonInput / IonTextarea placeholder */
+ion-input {
+  --placeholder-color: #a0a0a0;
+  --placeholder-font-style: italic;
+  --placeholder-opacity: 1;
+}
+
+ion-textarea {
+  --placeholder-color: #a0a0a0;
+  --placeholder-font-style: italic;
+  --placeholder-opacity: 1;
+}
+
+/* IonSearchbar placeholder */
+ion-searchbar {
+  --placeholder-color: #a0a0a0;
+  --placeholder-opacity: 1;
+}
+
+/* IonSelect "no value selected" placeholder */
+ion-select {
+  --placeholder-color: #a0a0a0;
+  --placeholder-opacity: 1;
+}
+
+/* Stacked IonLabel — label above the input, visually a field title */
+ion-label[position="stacked"] {
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--ion-color-primary, #3880ff) !important;
+  margin-bottom: 2px !important;
+}
+
+/* Native <input> elements used in LoginPage / RegisterLabPage / TeamPage Field components */
+input::placeholder {
+  color: #a0a0a0 !important;
+  font-style: italic !important;
+  opacity: 1 !important;
+}
