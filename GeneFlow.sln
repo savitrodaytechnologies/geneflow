@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneFlow.Core", "GeneFlow.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneFlow.Infrastructure", "GeneFlow.Infrastructure\GeneFlow.Infrastructure.csproj", "{43035E0D-CEB6-46FF-94B4-543E561080C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneFlow.Tests", "GeneFlow.Tests\GeneFlow.Tests.csproj", "{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{43035E0D-CEB6-46FF-94B4-543E561080C3}.Release|x64.Build.0 = Release|Any CPU
 		{43035E0D-CEB6-46FF-94B4-543E561080C3}.Release|x86.ActiveCfg = Release|Any CPU
 		{43035E0D-CEB6-46FF-94B4-543E561080C3}.Release|x86.Build.0 = Release|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Debug|x64.Build.0 = Debug|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Debug|x86.Build.0 = Debug|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Release|x64.ActiveCfg = Release|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Release|x64.Build.0 = Release|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Release|x86.ActiveCfg = Release|Any CPU
+		{6C87E9B6-BD82-4CD5-B8D0-905B5FC7A4CB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

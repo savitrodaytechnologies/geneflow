@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
     IonButton, IonSpinner, IonList, IonItem, IonLabel, IonText,
@@ -13,11 +13,14 @@ import { useExperiments, useCreateExperiment, useDuplicateExperiment, useDeleteE
 import { STATUS_COLORS } from '../types/api';
 import type { CreateExperimentRequest } from '../types/api';
 import { useIonRouter } from '@ionic/react';
+import { useLocation } from 'react-router-dom';
 
 const STATUS_FILTERS = ['All', 'Draft', 'PlateDesigned', 'DataUploaded', 'Analyzed', 'Finalized'];
 
 const ExperimentsPage: React.FC = () => {
     const router = useIonRouter();
+    const location = useLocation();
+    const openedViaNew = location.pathname === '/experiments/new';
     const { data: experiments, isLoading, refetch } = useExperiments();
     const { data: projects } = useProjects();
     const createExperiment = useCreateExperiment();
@@ -29,6 +32,14 @@ const ExperimentsPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
+
+    // Auto-open create modal when navigated from Dashboard "New Experiment" button
+    useEffect(() => {
+        if (openedViaNew) {
+            setForm({ experimentName: '', experimentDate: new Date().toISOString().split('T')[0], referenceGene: 'GAPDH', controlSampleName: 'Control', visibility: 2 });
+            setShowModal(true);
+        }
+    }, []);
 
     // Form state
     const [form, setForm] = useState<Partial<CreateExperimentRequest>>({
@@ -56,6 +67,11 @@ const ExperimentsPage: React.FC = () => {
         } catch {
             presentToast({ message: 'Failed to create experiment.', duration: 3000, color: 'danger' });
         }
+    };
+
+    const handleModalDismiss = () => {
+        setShowModal(false);
+        if (openedViaNew) router.push('/experiments');
     };
 
     const handleDuplicate = async (expId: string, expName: string) => {
@@ -180,12 +196,12 @@ const ExperimentsPage: React.FC = () => {
             </IonContent>
 
             {/* Create Experiment Modal */}
-            <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)} breakpoints={[0, 0.9]} initialBreakpoint={0.9}>
+            <IonModal isOpen={showModal} onDidDismiss={handleModalDismiss} breakpoints={[0, 0.9]} initialBreakpoint={0.9}>
                 <IonHeader>
                     <IonToolbar>
                         <IonTitle>New Experiment</IonTitle>
                         <IonButtons slot="end">
-                            <IonButton onClick={() => setShowModal(false)}>Cancel</IonButton>
+                            <IonButton onClick={handleModalDismiss}>Cancel</IonButton>
                         </IonButtons>
                     </IonToolbar>
                 </IonHeader>

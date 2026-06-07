@@ -103,5 +103,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Health endpoint — used by smoke tests and monitoring
+app.MapGet("/api/health", () => Results.Ok(new { status = "healthy", utc = DateTime.UtcNow }));
+
 app.Run();
 
