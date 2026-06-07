@@ -43,12 +43,13 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IExperimentService, ExperimentService>();
+builder.Services.AddScoped<IPlateService, PlateService>();
 
 // ── CORS ────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("IonicDev", policy =>
-        policy.WithOrigins("http://localhost:8100", "http://localhost:3000", "capacitor://localhost", "ionic://localhost")
+        policy.WithOrigins("http://localhost:8100", "http://localhost:5173", "http://localhost:3000", "capacitor://localhost", "ionic://localhost")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());

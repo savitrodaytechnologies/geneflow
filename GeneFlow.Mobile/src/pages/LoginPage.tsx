@@ -29,7 +29,7 @@ const LoginPage: React.FC = () => {
         setError('');
         setLoading(true);
         try {
-            const response = await apiClient.post<LoginResponse>('/api/auth/login', { email, password });
+            const response = await apiClient.post<LoginResponse>('/auth/login', { email, password });
             login(response.data.token, response.data.user);
             history.replace('/home');
         } catch (err: unknown) {

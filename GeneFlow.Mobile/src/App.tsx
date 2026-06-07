@@ -19,6 +19,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ExperimentsPage from './pages/ExperimentsPage';
+import ExperimentDetailPage from './pages/ExperimentDetailPage';
 import UploadPage from './pages/UploadPage';
 import MorePage from './pages/MorePage';
 
@@ -72,6 +73,8 @@ const AppRoutes: React.FC = () => {
         <Route exact path="/home" component={DashboardPage} />
         <Route exact path="/projects" component={ProjectsPage} />
         <Route exact path="/experiments" component={ExperimentsPage} />
+        <Route exact path="/experiments/new" component={ExperimentsPage} />
+        <Route path="/experiments/:experimentId" component={ExperimentDetailPage} />
         <Route exact path="/upload" component={UploadPage} />
         <Route exact path="/more" component={MorePage} />
         <Route exact path="/">
