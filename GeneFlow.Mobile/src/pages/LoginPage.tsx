@@ -112,7 +112,7 @@ const LoginPage: React.FC = () => {
                             inputMode="numeric"
                             value={phone}
                             onChange={setPhone}
-                            placeholder="9876543210  (digits only, no country code)"
+                            placeholder="e.g. 7323317354 (digits only)"
                             autocomplete="tel-national"
                         />
                     ) : (

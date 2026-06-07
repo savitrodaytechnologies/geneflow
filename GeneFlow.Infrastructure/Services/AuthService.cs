@@ -21,21 +21,7 @@ public class AuthService : IAuthService
 
     public async Task<LoginResponse?> LoginAsync(LoginRequest request)
     {
-        User? user = null;
-
-        // Try phone number first, then email
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-        {
-            var normalizedPhone = NormalizePhone(request.PhoneNumber);
-            user = await _db.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.PhoneNumber == normalizedPhone && u.IsActive);
-        }
-
-        if (user is null && !string.IsNullOrWhiteSpace(request.Email))
-        {
-            user = await _db.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant() && u.IsActive);
-        }
+        var user = await FindActiveUserAsync(request.PhoneNumber, request.Email);
 
         if (user is null || string.IsNullOrEmpty(user.PasswordHash))
             return null;
@@ -253,15 +239,7 @@ public class AuthService : IAuthService
 
     public async Task<ForgotPasswordResponse?> ForgotPasswordAsync(ForgotPasswordRequest request)
     {
-        User? user = null;
-
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-            user = await _db.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.PhoneNumber == NormalizePhone(request.PhoneNumber) && u.IsActive);
-
-        if (user is null && !string.IsNullOrWhiteSpace(request.Email))
-            user = await _db.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant() && u.IsActive);
+        var user = await FindActiveUserAsync(request.PhoneNumber, request.Email);
 
         if (user is null) return null; // Don't reveal whether account exists
 
@@ -278,15 +256,7 @@ public class AuthService : IAuthService
 
     public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
     {
-        User? user = null;
-
-        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-            user = await _db.Users
-                .FirstOrDefaultAsync(u => u.PhoneNumber == NormalizePhone(request.PhoneNumber) && u.IsActive);
-
-        if (user is null && !string.IsNullOrWhiteSpace(request.Email))
-            user = await _db.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant() && u.IsActive);
+        var user = await FindActiveUserAsync(request.PhoneNumber, request.Email, tracking: true);
 
         if (user is null) return false;
 
@@ -361,6 +331,42 @@ public class AuthService : IAuthService
     // ── Helpers ────────────────────────────────────────────────────────────
     private static string NormalizePhone(string phone) =>
         new string(phone.Where(char.IsDigit).ToArray());
+
+    /// <summary>
+    /// Finds an active user by phone or email.
+    /// Phone matching: exact first, then tries common country-code prefixes so users
+    /// don't have to type the country code at login (e.g. entering "7323317354" matches "17323317354").
+    /// </summary>
+    private async Task<User?> FindActiveUserAsync(string? phone, string? email, bool tracking = false)
+    {
+        User? user = null;
+        var query = tracking ? _db.Users : _db.Users.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(phone))
+        {
+            var digits = NormalizePhone(phone);
+            // Exact match
+            user = await query.FirstOrDefaultAsync(u => u.PhoneNumber == digits && u.IsActive);
+
+            // If no exact match, try matching phones that END with the entered digits
+            // (handles users who stored "+1 7323317354" → "17323317354" but type "7323317354")
+            if (user is null && digits.Length >= 7 && digits.Length <= 13)
+            {
+                user = await query.FirstOrDefaultAsync(u =>
+                    u.PhoneNumber != null &&
+                    u.PhoneNumber.EndsWith(digits) &&
+                    u.IsActive);
+            }
+        }
+
+        if (user is null && !string.IsNullOrWhiteSpace(email))
+        {
+            user = await query.FirstOrDefaultAsync(u =>
+                u.Email == email.ToLowerInvariant() && u.IsActive);
+        }
+
+        return user;
+    }
 
     private static UserDto MapUserDto(User user, LabUser? labUser) => new()
     {

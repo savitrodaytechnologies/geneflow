@@ -134,7 +134,7 @@ const ForgotPasswordPage: React.FC = () => {
                         </div>
 
                         {mode === 'phone' ? (
-                            <Field label="PHONE NUMBER (digits only)">
+                            <Field label="PHONE NUMBER">
                                 <input
                                     style={inputStyle}
                                     type="tel"
@@ -143,6 +143,9 @@ const ForgotPasswordPage: React.FC = () => {
                                     value={phone}
                                     onChange={e => setPhone(e.target.value)}
                                 />
+                                <div style={{ fontSize: 12, color: 'var(--ion-color-medium)', marginTop: 4 }}>
+                                    Enter the number you registered with (digits only). If you added a country code at registration, you can omit it here.
+                                </div>
                             </Field>
                         ) : (
                             <Field label="EMAIL ADDRESS">
@@ -177,38 +180,41 @@ const ForgotPasswordPage: React.FC = () => {
 
                 {step === 'reset' && (
                     <>
-                        <div style={{ marginBottom: 24 }}>
+                        <div style={{ marginBottom: 20 }}>
                             <IonText color="medium">
                                 <p style={{ margin: 0 }}>
-                                    Your reset code is shown below (in production this would be sent via SMS).
-                                    Enter it along with your new password.
+                                    Your reset code is displayed below — copy it before entering your new password.
                                 </p>
                             </IonText>
                         </div>
 
-                        {resetCode && (
-                            <div style={{
-                                background: 'var(--ion-color-warning-tint)',
-                                border: '1px solid var(--ion-color-warning)',
-                                borderRadius: 8, padding: '12px 16px', marginBottom: 20,
-                                textAlign: 'center'
-                            }}>
-                                <div style={{ fontSize: 11, color: 'var(--ion-color-medium)', marginBottom: 4 }}>YOUR RESET CODE</div>
-                                <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: 8, color: 'var(--ion-color-dark)' }}>
-                                    {resetCode}
-                                </div>
-                                <div style={{ fontSize: 11, color: 'var(--ion-color-medium)', marginTop: 4 }}>Valid for 15 minutes</div>
+                        {/* Reset code box — always visible */}
+                        <div style={{
+                            background: '#fff8e1',
+                            border: '2px solid #f59e0b',
+                            borderRadius: 12, padding: '16px 20px', marginBottom: 24,
+                            textAlign: 'center'
+                        }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#92400e', marginBottom: 6, letterSpacing: 1 }}>
+                                YOUR 6-DIGIT RESET CODE
                             </div>
-                        )}
+                            <div style={{ fontSize: 36, fontWeight: 800, letterSpacing: 12, color: '#1c1c1e', fontVariantNumeric: 'tabular-nums' }}>
+                                {resetCode || '——————'}
+                            </div>
+                            <div style={{ fontSize: 12, color: '#b45309', marginTop: 6 }}>
+                                Valid for 15 minutes · Do not close this screen
+                            </div>
+                        </div>
 
-                        <Field label="RESET CODE">
+                        <Field label="ENTER RESET CODE ABOVE">
                             <input
-                                style={inputStyle}
+                                style={{ ...inputStyle, fontSize: 22, letterSpacing: 8, textAlign: 'center', fontWeight: 700 }}
                                 type="text"
                                 inputMode="numeric"
-                                placeholder="6-digit code"
+                                placeholder="• • • • • •"
+                                maxLength={6}
                                 value={enteredCode}
-                                onChange={e => setEnteredCode(e.target.value)}
+                                onChange={e => setEnteredCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                             />
                         </Field>
 
@@ -238,7 +244,7 @@ const ForgotPasswordPage: React.FC = () => {
                             expand="block"
                             style={{ marginTop: 8 }}
                             onClick={handleResetPassword}
-                            disabled={resetPassword.isPending}
+                            disabled={resetPassword.isPending || enteredCode.length < 6}
                         >
                             {resetPassword.isPending ? <IonSpinner name="crescent" /> : 'Reset Password'}
                         </IonButton>
