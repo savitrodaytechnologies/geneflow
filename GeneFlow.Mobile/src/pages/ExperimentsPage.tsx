@@ -19,8 +19,7 @@ const STATUS_FILTERS = ['All', 'Draft', 'PlateDesigned', 'DataUploaded', 'Analyz
 
 const ExperimentsPage: React.FC = () => {
     const router = useIonRouter();
-    const location = useLocation();
-    const openedViaNew = location.pathname === '/experiments/new';
+    const location = useLocation<{ openNew?: boolean }>();
     const { data: experiments, isLoading, refetch } = useExperiments();
     const { data: projects } = useProjects();
     const createExperiment = useCreateExperiment();
@@ -33,13 +32,15 @@ const ExperimentsPage: React.FC = () => {
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
-    // Auto-open create modal when navigated from Dashboard "New Experiment" button
+    // Open create modal when Dashboard "New Experiment" button pushes state { openNew: true }
     useEffect(() => {
-        if (openedViaNew) {
+        if ((location.state as any)?.openNew) {
             setForm({ experimentName: '', experimentDate: new Date().toISOString().split('T')[0], referenceGene: 'GAPDH', controlSampleName: 'Control', visibility: 2 });
             setShowModal(true);
+            // Clear state so pressing back doesn't re-open the modal
+            window.history.replaceState({}, '');
         }
-    }, []);
+    }, [location.state]);
 
     // Form state
     const [form, setForm] = useState<Partial<CreateExperimentRequest>>({
@@ -71,7 +72,6 @@ const ExperimentsPage: React.FC = () => {
 
     const handleModalDismiss = () => {
         setShowModal(false);
-        if (openedViaNew) router.push('/experiments');
     };
 
     const handleDuplicate = async (expId: string, expName: string) => {

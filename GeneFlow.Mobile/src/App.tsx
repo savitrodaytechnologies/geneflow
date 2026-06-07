@@ -79,7 +79,6 @@ const AppRoutes: React.FC = () => {
         <Route exact path="/home" component={DashboardPage} />
         <Route exact path="/projects" component={ProjectsPage} />
         <Route exact path="/experiments" component={ExperimentsPage} />
-        <Route exact path="/experiments/new" component={ExperimentsPage} />
         <Route path="/experiments/:experimentId" component={ExperimentDetailPage} />
         <Route exact path="/upload" component={UploadPage} />
         <Route exact path="/team" component={TeamPage} />

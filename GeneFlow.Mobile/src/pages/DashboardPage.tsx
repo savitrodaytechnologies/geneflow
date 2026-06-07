@@ -10,11 +10,11 @@ import { flaskOutline, warningOutline, documentTextOutline, timeOutline, addCirc
 import { useAuth } from '../context/AuthContext';
 import { useDashboard } from '../hooks/useApi';
 import { STATUS_COLORS } from '../types/api';
-import { useIonRouter } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 
 const DashboardPage: React.FC = () => {
     const { user } = useAuth();
-    const router = useIonRouter();
+    const history = useHistory();
     const { data, isLoading, refetch } = useDashboard();
 
     const summary = data?.summary;
@@ -48,7 +48,7 @@ const DashboardPage: React.FC = () => {
                 </div>
 
                 <div style={{ padding: '0 16px 16px' }}>
-                    <IonButton expand="block" onClick={() => router.push('/experiments/new')}>
+                    <IonButton expand="block" onClick={() => history.push('/experiments', { openNew: true })}>
                         <IonIcon slot="start" icon={addCircleOutline} />
                         New Experiment
                     </IonButton>
@@ -99,7 +99,7 @@ const DashboardPage: React.FC = () => {
                                     <IonItem
                                         key={exp.experimentId}
                                         button
-                                        onClick={() => router.push(`/experiments/${exp.experimentId}`)}
+                                        onClick={() => history.push(`/experiments/${exp.experimentId}`)}
                                         style={{ '--border-radius': '12px', marginBottom: 4 }}
                                     >
                                         <IonLabel>

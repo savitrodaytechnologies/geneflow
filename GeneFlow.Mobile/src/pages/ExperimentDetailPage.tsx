@@ -17,10 +17,13 @@ const ExperimentDetailPage: React.FC = () => {
     const [tab, setTab] = useState<string>('setup');
     const [presentToast] = useIonToast();
 
+    // Guard: if experimentId is "new" or not a GUID, don't attempt an API call
+    const isValidId = experimentId && experimentId !== 'new' && experimentId.length > 10;
+
     const { data: experiment, isLoading } = useQuery({
         queryKey: ['experiment', experimentId],
         queryFn: () => apiClient.get(`/experiments/${experimentId}`).then(r => r.data),
-        enabled: !!experimentId,
+        enabled: !!isValidId,
     });
 
     if (isLoading) {

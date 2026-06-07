@@ -21,10 +21,10 @@
 #>
 
 param(
-    [string]$ApiBase    = "https://gflowapi.svais.net",
+    [string]$ApiBase = "https://gflowapi.svais.net",
     [string]$FrontendUrl = "https://geneflow.svais.net",
-    [string]$TestEmail   = "admin@geneflow.local",
-    [string]$TestPhone   = "919876543210",       # digits only, no + sign
+    [string]$TestEmail = "admin@geneflow.local",
+    [string]$TestPhone = "919876543210",       # digits only, no + sign
     [string]$TestPassword = "Admin@123!"
 )
 
@@ -41,12 +41,14 @@ function Test-Step {
         if ($result -eq $true -or $null -eq $result) {
             Write-Host "PASS" -ForegroundColor Green
             $script:pass++
-        } else {
+        }
+        else {
             Write-Host "FAIL — $result" -ForegroundColor Red
             $script:fail++
             $script:errors.Add("$Name`: $result")
         }
-    } catch {
+    }
+    catch {
         Write-Host "ERROR — $_" -ForegroundColor Red
         $script:fail++
         $script:errors.Add("$Name`: $_")
@@ -64,11 +66,11 @@ function Invoke-Api {
     if ($Token) { $headers["Authorization"] = "Bearer $Token" }
 
     $params = @{
-        Uri     = $Url
-        Method  = $Method
-        Headers = $headers
+        Uri             = $Url
+        Method          = $Method
+        Headers         = $headers
         UseBasicParsing = $true
-        ErrorAction = "Stop"
+        ErrorAction     = "Stop"
     }
     if ($Method -ne "GET" -and $Body.Count -gt 0) {
         $params["Body"] = ($Body | ConvertTo-Json -Depth 5)
@@ -92,7 +94,8 @@ Test-Step "1. API Health" {
         $r = Invoke-Api -Url "$ApiBase/api/health"
         if ($r.StatusCode -eq 200) { return $true }
         return "Status $($r.StatusCode)"
-    } catch [System.Net.WebException] {
+    }
+    catch [System.Net.WebException] {
         # health endpoint may not exist; try login endpoint as fallback
         if ($_.Exception.Response.StatusCode -eq 404) {
             return $true  # API is reachable, /health just not implemented yet
@@ -122,7 +125,8 @@ Test-Step "3. Login (phone)" {
         }
         if ($r.StatusCode -in 200, 401) { return $true }  # 401 = wrong phone seed, but API alive
         return "Status $($r.StatusCode)"
-    } catch {
+    }
+    catch {
         # phone may not be seeded — 401 is acceptable
         if ($_.Exception.Response.StatusCode -eq 401) { return $true }
         throw
@@ -137,7 +141,8 @@ Test-Step "4. Bad login → 401" {
             password = "WrongPassword999!"
         }
         return "Expected 401 but got 200"
-    } catch {
+    }
+    catch {
         $status = $_.Exception.Response.StatusCode
         if ($status -eq "Unauthorized" -or [int]$status -eq 401) { return $true }
         return "Expected 401 but got $status"
