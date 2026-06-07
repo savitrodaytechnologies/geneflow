@@ -1,0 +1,26 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+*.nupkg
+
+# EF Core design-time targets
+**/obj/*.csproj.EntityFrameworkCore.targets
+
+# User secrets / env overrides
+appsettings.Production.json
+appsettings.Staging.json
+
+# Ionic / Node
+GeneFlow.Mobile/node_modules/
+GeneFlow.Mobile/dist/
+GeneFlow.Mobile/www/
+GeneFlow.Mobile/.env.production
+GeneFlow.Mobile/android/
+GeneFlow.Mobile/ios/
+
+# Misc
+*.DS_Store
+Thumbs.db
