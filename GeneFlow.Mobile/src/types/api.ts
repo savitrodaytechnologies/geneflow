@@ -100,3 +100,52 @@ export const STATUS_COLORS: Record<string, string> = {
     Finalized: 'tertiary',
     Archived: 'dark',
 };
+
+// ── Auth / User types ───────────────────────────────────────────────────────
+export interface UserDto {
+    userId: string;
+    email: string;
+    phoneNumber?: string;
+    fullName: string;
+    systemRole: string;
+    labId?: string;
+    labRole?: string;
+}
+
+export interface LoginResponse {
+    token: string;
+    user: UserDto;
+}
+
+export interface RegisterLabRequest {
+    labName: string;
+    institutionName?: string;
+    adminFullName: string;
+    adminEmail: string;
+    adminPhoneNumber?: string;
+    adminPassword: string;
+}
+
+export interface RegisterLabResponse {
+    labId: string;
+    labName: string;
+    token: string;
+    user: UserDto;
+}
+
+export interface LabMemberDto {
+    userId: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: string;
+    labRole: string;
+    isActive: boolean;
+}
+
+export interface AddLabUserRequest {
+    fullName: string;
+    email?: string;
+    phoneNumber?: string;
+    password: string;
+    labRole: string;
+}

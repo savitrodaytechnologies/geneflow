@@ -12,15 +12,17 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { home, folder, flask, cloudUpload, ellipsisHorizontal } from 'ionicons/icons';
+import { home, folder, flask, cloudUpload, people, ellipsisHorizontal } from 'ionicons/icons';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 import LoginPage from './pages/LoginPage';
+import RegisterLabPage from './pages/RegisterLabPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ExperimentsPage from './pages/ExperimentsPage';
 import ExperimentDetailPage from './pages/ExperimentDetailPage';
 import UploadPage from './pages/UploadPage';
+import TeamPage from './pages/TeamPage';
 import MorePage from './pages/MorePage';
 
 /* Core CSS required for Ionic components to work properly */
@@ -62,6 +64,7 @@ const AppRoutes: React.FC = () => {
     return (
       <IonRouterOutlet>
         <Route exact path="/login" component={LoginPage} />
+        <Route exact path="/register-lab" component={RegisterLabPage} />
         <Route render={() => <Redirect to="/login" />} />
       </IonRouterOutlet>
     );
@@ -76,6 +79,7 @@ const AppRoutes: React.FC = () => {
         <Route exact path="/experiments/new" component={ExperimentsPage} />
         <Route path="/experiments/:experimentId" component={ExperimentDetailPage} />
         <Route exact path="/upload" component={UploadPage} />
+        <Route exact path="/team" component={TeamPage} />
         <Route exact path="/more" component={MorePage} />
         <Route exact path="/">
           <Redirect to="/home" />
@@ -97,6 +101,10 @@ const AppRoutes: React.FC = () => {
         <IonTabButton tab="upload" href="/upload">
           <IonIcon icon={cloudUpload} />
           <IonLabel>Upload</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="team" href="/team">
+          <IonIcon icon={people} />
+          <IonLabel>Team</IonLabel>
         </IonTabButton>
         <IonTabButton tab="more" href="/more">
           <IonIcon icon={ellipsisHorizontal} />

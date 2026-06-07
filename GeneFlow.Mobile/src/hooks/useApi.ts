@@ -7,7 +7,53 @@ import type {
     ExperimentSummaryDto,
     CreateExperimentRequest,
     PlateGridDto,
+    LoginResponse,
+    RegisterLabRequest,
+    RegisterLabResponse,
+    LabMemberDto,
+    AddLabUserRequest,
 } from '../types/api';
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+export function useLogin() {
+    return useMutation({
+        mutationFn: (data: { email?: string; phoneNumber?: string; password: string }) =>
+            apiClient.post<LoginResponse>('/auth/login', data).then(r => r.data),
+    });
+}
+
+export function useRegisterLab() {
+    return useMutation({
+        mutationFn: (data: RegisterLabRequest) =>
+            apiClient.post<RegisterLabResponse>('/auth/register-lab', data).then(r => r.data),
+    });
+}
+
+export function useLabMembers(labId: string | undefined) {
+    return useQuery<LabMemberDto[]>({
+        queryKey: ['lab-members', labId],
+        queryFn: () => apiClient.get(`/auth/labs/${labId}/members`).then(r => r.data),
+        enabled: !!labId,
+    });
+}
+
+export function useAddLabMember(labId: string) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (data: AddLabUserRequest) =>
+            apiClient.post<LabMemberDto>(`/auth/labs/${labId}/members`, data).then(r => r.data),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['lab-members', labId] }),
+    });
+}
+
+export function useRemoveLabMember(labId: string) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (userId: string) =>
+            apiClient.delete(`/auth/labs/${labId}/members/${userId}`),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['lab-members', labId] }),
+    });
+}
 
 // ── Dashboard ───────────────────────────────────────────────────────────────
 export function useDashboard() {

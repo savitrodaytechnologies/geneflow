@@ -49,7 +49,7 @@ builder.Services.AddScoped<IPlateService, PlateService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("IonicDev", policy =>
-        policy.WithOrigins("http://localhost:8100", "http://localhost:5173", "http://localhost:3000", "capacitor://localhost", "ionic://localhost")
+        policy.WithOrigins("http://localhost:8100", "http://localhost:5173", "http://localhost:3000", "capacitor://localhost", "ionic://localhost", "https://geneflow.svais.net", "http://geneflow.svais.net")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
@@ -87,6 +87,7 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     db.Database.Migrate();
     await DataSeeder.SeedAsync(db, logger);
+    await DataSeeder.SeedExtraUsersAsync(db, logger);
 }
 
 // ── Middleware pipeline ─────────────────────────────────────────────────────
