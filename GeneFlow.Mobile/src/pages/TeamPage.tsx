@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
-    IonList, IonItem, IonLabel, IonBadge, IonButton, IonButtons,
-    IonFab, IonFabButton, IonIcon, IonModal, IonInput, IonSelect,
-    IonSelectOption, IonAlert, IonSpinner, IonText, IonNote,
+    IonList, IonItem, IonLabel, IonButton, IonButtons,
+    IonIcon, IonModal, IonSelect, IonSelectOption,
+    IonAlert, IonSpinner, IonText,
     IonAvatar, IonChip, IonRefresher, IonRefresherContent,
 } from '@ionic/react';
 import { add, personRemove } from 'ionicons/icons';
@@ -17,6 +17,33 @@ const ROLE_COLOR: Record<string, string> = {
     Viewer: 'medium',
 };
 
+// Shared field for modal — no floating label overlap
+const MField: React.FC<{
+    label: string; type?: string; value: string;
+    onChange: (v: string) => void; placeholder?: string; hint?: string;
+}> = ({ label, type = 'text', value, onChange, placeholder, hint }) => (
+    <div style={{ marginBottom: 14 }}>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--ion-color-medium)', marginBottom: 5, paddingLeft: 2 }}>
+            {label}
+        </label>
+        <input
+            type={type}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            placeholder={placeholder}
+            inputMode={type === 'tel' ? 'numeric' : undefined}
+            style={{
+                width: '100%', boxSizing: 'border-box',
+                padding: '11px 14px', fontSize: 16,
+                borderRadius: 10, border: '1.5px solid var(--ion-color-light-shade)',
+                background: 'var(--ion-item-background, var(--ion-background-color))',
+                color: 'var(--ion-text-color)', outline: 'none',
+            }}
+        />
+        {hint && <p style={{ fontSize: 12, color: 'var(--ion-color-medium)', margin: '3px 0 0 2px' }}>{hint}</p>}
+    </div>
+);
+
 const TeamPage: React.FC = () => {
     const { user } = useAuth();
     const labId = user?.labId ?? '';
@@ -29,7 +56,6 @@ const TeamPage: React.FC = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [removeTarget, setRemoveTarget] = useState<{ userId: string; name: string } | null>(null);
 
-    // Add member form state
     const [form, setForm] = useState<AddLabUserRequest>({
         fullName: '', email: '', phoneNumber: '', password: '', labRole: 'Researcher',
     });
@@ -103,12 +129,8 @@ const TeamPage: React.FC = () => {
                                     {m.labRole}
                                 </IonChip>
                                 {isAdmin && m.userId !== user?.userId && (
-                                    <IonButton
-                                        fill="clear"
-                                        color="danger"
-                                        slot="end"
-                                        onClick={() => setRemoveTarget({ userId: m.userId, name: m.fullName })}
-                                    >
+                                    <IonButton fill="clear" color="danger" slot="end"
+                                        onClick={() => setRemoveTarget({ userId: m.userId, name: m.fullName })}>
                                         <IonIcon icon={personRemove} slot="icon-only" />
                                     </IonButton>
                                 )}
@@ -134,40 +156,37 @@ const TeamPage: React.FC = () => {
                     </IonToolbar>
                 </IonHeader>
                 <IonContent className="ion-padding">
-                    <IonItem>
-                        <IonLabel position="floating">Full Name *</IonLabel>
-                        <IonInput value={form.fullName} onIonInput={e => setForm(f => ({ ...f, fullName: e.detail.value ?? '' }))} />
-                    </IonItem>
-                    <IonItem style={{ marginTop: 8 }}>
-                        <IonLabel position="floating">Phone Number</IonLabel>
-                        <IonInput type="tel" value={form.phoneNumber} onIonInput={e => setForm(f => ({ ...f, phoneNumber: e.detail.value ?? '' }))} />
-                        <IonNote slot="helper">Preferred — used for login</IonNote>
-                    </IonItem>
-                    <IonItem style={{ marginTop: 8 }}>
-                        <IonLabel position="floating">Email</IonLabel>
-                        <IonInput type="email" value={form.email} onIonInput={e => setForm(f => ({ ...f, email: e.detail.value ?? '' }))} />
-                    </IonItem>
-                    <IonItem style={{ marginTop: 8 }}>
-                        <IonLabel position="floating">Temporary Password *</IonLabel>
-                        <IonInput type="password" value={form.password} onIonInput={e => setForm(f => ({ ...f, password: e.detail.value ?? '' }))} />
-                        <IonNote slot="helper">Share this with the new member so they can log in</IonNote>
-                    </IonItem>
-                    <IonItem style={{ marginTop: 8 }}>
-                        <IonLabel>Role</IonLabel>
-                        <IonSelect value={form.labRole} onIonChange={e => setForm(f => ({ ...f, labRole: e.detail.value }))}>
-                            <IonSelectOption value="Researcher">Researcher</IonSelectOption>
-                            <IonSelectOption value="LabAdmin">Lab Admin</IonSelectOption>
-                            <IonSelectOption value="Viewer">Viewer</IonSelectOption>
-                        </IonSelect>
-                    </IonItem>
-                    {addError && (
-                        <IonText color="danger">
-                            <p style={{ paddingLeft: 16, fontSize: 14 }}>{addError}</p>
-                        </IonText>
-                    )}
-                    <IonButton expand="block" style={{ marginTop: 24 }} onClick={handleAdd} disabled={addMember.isPending}>
-                        {addMember.isPending ? <IonSpinner name="crescent" /> : 'Add Member'}
-                    </IonButton>
+                    <div style={{ marginTop: 8 }}>
+                        <MField label="Full Name *" value={form.fullName} onChange={v => setForm(f => ({ ...f, fullName: v }))} placeholder="Dr. Jane Smith" />
+                        <MField label="Phone Number (preferred for login)" type="tel" value={form.phoneNumber ?? ''}
+                            onChange={v => setForm(f => ({ ...f, phoneNumber: v }))}
+                            placeholder="9876543210 (digits only)" hint="Include country code if needed, e.g. 19876543210" />
+                        <MField label="Email" type="email" value={form.email ?? ''} onChange={v => setForm(f => ({ ...f, email: v }))} placeholder="user@lab.com" />
+                        <MField label="Temporary Password *" type="password" value={form.password} onChange={v => setForm(f => ({ ...f, password: v }))}
+                            hint="Share this with the new member so they can log in" />
+
+                        <div style={{ marginBottom: 14 }}>
+                            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--ion-color-medium)', marginBottom: 5, paddingLeft: 2 }}>
+                                Role
+                            </label>
+                            <IonItem lines="none" style={{ borderRadius: 10, border: '1.5px solid var(--ion-color-light-shade)' }}>
+                                <IonSelect value={form.labRole} onIonChange={e => setForm(f => ({ ...f, labRole: e.detail.value }))}>
+                                    <IonSelectOption value="Researcher">Researcher</IonSelectOption>
+                                    <IonSelectOption value="LabAdmin">Lab Admin</IonSelectOption>
+                                    <IonSelectOption value="Viewer">Viewer</IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
+                        </div>
+
+                        {addError && (
+                            <IonText color="danger">
+                                <p style={{ fontSize: 13, marginBottom: 8 }}>{addError}</p>
+                            </IonText>
+                        )}
+                        <IonButton expand="block" style={{ marginTop: 8 }} onClick={handleAdd} disabled={addMember.isPending}>
+                            {addMember.isPending ? <IonSpinner name="crescent" /> : 'Add Member'}
+                        </IonButton>
+                    </div>
                 </IonContent>
             </IonModal>
 
