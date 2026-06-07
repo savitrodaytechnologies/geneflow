@@ -109,7 +109,8 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
 
             {view === 'grid' ? (
                 /* 8×12 Grid View */
-                <div style={{ overflowX: 'auto', padding: '8px 12px' }}>
+                <div style={{ overflowX: 'auto', padding: '8px 12px', display: 'flex', justifyContent: 'center' }}>
+                <div style={{ display: 'inline-block' }}>
                     {/* Column headers */}
                     <div style={{ display: 'flex', marginLeft: 22, marginBottom: 2 }}>
                         {Array.from({ length: 12 }, (_, i) => (
@@ -165,6 +166,7 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
                             empty
                         </div>
                     </div>
+                </div>
                 </div>
             ) : (
                 /* List View - only filled wells */
