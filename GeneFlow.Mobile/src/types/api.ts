@@ -149,3 +149,25 @@ export interface AddLabUserRequest {
     password: string;
     labRole: string;
 }
+
+export interface ForgotPasswordRequest {
+    email?: string;
+    phoneNumber?: string;
+}
+
+export interface ForgotPasswordResponse {
+    resetCode: string;
+    message: string;
+}
+
+export interface ResetPasswordRequest {
+    email?: string;
+    phoneNumber?: string;
+    resetCode: string;
+    newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+}

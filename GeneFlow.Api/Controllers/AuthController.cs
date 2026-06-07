@@ -117,5 +117,83 @@ public class AuthController : ControllerBase
             return Forbid(ex.Message);
         }
     }
+
+    // ── Password management ────────────────────────────────────────────────
+
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.PhoneNumber))
+            return BadRequest(new { message = "Email or phone number is required." });
+
+        // Always return 200 to avoid account enumeration; result is null if user not found
+        var result = await _authService.ForgotPasswordAsync(request);
+        if (result is null)
+            return Ok(new { message = "If that account exists, a reset code has been provided." });
+
+        return Ok(result);
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.ResetCode))
+            return BadRequest(new { message = "Reset code is required." });
+        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 8)
+            return BadRequest(new { message = "New password must be at least 8 characters." });
+
+        try
+        {
+            var ok = await _authService.ResetPasswordAsync(request);
+            if (!ok) return BadRequest(new { message = "Invalid or expired reset code." });
+            return Ok(new { message = "Password reset successfully. Please log in." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPut("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+            return BadRequest(new { message = "Current password is required." });
+        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 8)
+            return BadRequest(new { message = "New password must be at least 8 characters." });
+
+        try
+        {
+            var ok = await _authService.ChangePasswordAsync(_currentUser.UserId, request);
+            if (!ok) return BadRequest(new { message = "Current password is incorrect." });
+            return Ok(new { message = "Password changed successfully." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("labs/{labId}/members/{userId}/reset-password")]
+    [Authorize]
+    public async Task<IActionResult> AdminResetPassword(Guid labId, Guid userId, [FromBody] AdminResetPasswordRequest request)
+    {
+        try
+        {
+            var newPassword = await _authService.AdminResetPasswordAsync(labId, userId, _currentUser.UserId, request);
+            return Ok(new { message = "Password reset successfully.", temporaryPassword = newPassword });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }
 

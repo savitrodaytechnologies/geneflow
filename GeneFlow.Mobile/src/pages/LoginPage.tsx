@@ -146,7 +146,13 @@ const LoginPage: React.FC = () => {
                         {loading ? <IonSpinner name="crescent" /> : 'Sign In'}
                     </IonButton>
 
-                    <div style={{ textAlign: 'center', marginTop: 20 }}>
+                    <div style={{ textAlign: 'center', marginTop: 12 }}>
+                        <IonButton fill="clear" size="small" routerLink="/forgot-password">
+                            Forgot Password?
+                        </IonButton>
+                    </div>
+
+                    <div style={{ textAlign: 'center', marginTop: 4 }}>
                         <IonText color="medium" style={{ fontSize: 14 }}>New to GeneFlow?&nbsp;</IonText>
                         <IonButton fill="clear" size="small" routerLink="/register-lab">
                             Register your lab

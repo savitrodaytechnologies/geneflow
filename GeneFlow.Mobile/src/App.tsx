@@ -17,6 +17,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 import LoginPage from './pages/LoginPage';
 import RegisterLabPage from './pages/RegisterLabPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ExperimentsPage from './pages/ExperimentsPage';
@@ -65,6 +67,7 @@ const AppRoutes: React.FC = () => {
       <IonRouterOutlet>
         <Route exact path="/login" component={LoginPage} />
         <Route exact path="/register-lab" component={RegisterLabPage} />
+        <Route exact path="/forgot-password" component={ForgotPasswordPage} />
         <Route render={() => <Redirect to="/login" />} />
       </IonRouterOutlet>
     );
@@ -81,6 +84,7 @@ const AppRoutes: React.FC = () => {
         <Route exact path="/upload" component={UploadPage} />
         <Route exact path="/team" component={TeamPage} />
         <Route exact path="/more" component={MorePage} />
+        <Route exact path="/change-password" component={ChangePasswordPage} />
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>

@@ -11,4 +11,8 @@ public interface IAuthService
     Task<LabMemberDto> AddLabUserAsync(Guid labId, Guid requestingUserId, AddLabUserRequest request);
     Task<List<LabMemberDto>> GetLabMembersAsync(Guid labId);
     Task<bool> DeactivateLabUserAsync(Guid labId, Guid targetUserId, Guid requestingUserId);
+    Task<ForgotPasswordResponse?> ForgotPasswordAsync(ForgotPasswordRequest request);
+    Task<bool> ResetPasswordAsync(ResetPasswordRequest request);
+    Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordRequest request);
+    Task<string> AdminResetPasswordAsync(Guid labId, Guid targetUserId, Guid requestingUserId, AdminResetPasswordRequest request);
 }

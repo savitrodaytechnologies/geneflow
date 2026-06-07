@@ -12,6 +12,10 @@ import type {
     RegisterLabResponse,
     LabMemberDto,
     AddLabUserRequest,
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
+    ResetPasswordRequest,
+    ChangePasswordRequest,
 } from '../types/api';
 
 // ── Auth ────────────────────────────────────────────────────────────────────
@@ -19,6 +23,34 @@ export function useLogin() {
     return useMutation({
         mutationFn: (data: { email?: string; phoneNumber?: string; password: string }) =>
             apiClient.post<LoginResponse>('/auth/login', data).then(r => r.data),
+    });
+}
+
+export function useForgotPassword() {
+    return useMutation({
+        mutationFn: (data: ForgotPasswordRequest) =>
+            apiClient.post<ForgotPasswordResponse>('/auth/forgot-password', data).then(r => r.data),
+    });
+}
+
+export function useResetPassword() {
+    return useMutation({
+        mutationFn: (data: ResetPasswordRequest) =>
+            apiClient.post('/auth/reset-password', data).then(r => r.data),
+    });
+}
+
+export function useChangePassword() {
+    return useMutation({
+        mutationFn: (data: ChangePasswordRequest) =>
+            apiClient.put('/auth/change-password', data).then(r => r.data),
+    });
+}
+
+export function useAdminResetPassword(labId: string) {
+    return useMutation({
+        mutationFn: ({ userId, newPassword }: { userId: string; newPassword: string }) =>
+            apiClient.post(`/auth/labs/${labId}/members/${userId}/reset-password`, { newPassword }).then(r => r.data),
     });
 }
 
