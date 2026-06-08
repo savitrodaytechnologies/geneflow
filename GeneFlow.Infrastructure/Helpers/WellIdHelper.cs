@@ -58,4 +58,36 @@ public static class WellIdHelper
 
         return allWells.GetRange(fromIndex, toIndex - fromIndex + 1);
     }
+
+    /// <summary>
+    /// Column-major well range: iterates columns first within the rectangular
+    /// region defined by fromWell (top-left) and toWell (bottom-right).
+    /// e.g. A01→H04 → A01,B01,C01…H01, A02,B02…H02, A03…H03, A04…H04
+    /// </summary>
+    public static List<string> GenerateWellRangeByColumn(string fromWell, string toWell)
+    {
+        var from = NormalizeWellId(fromWell);
+        var to   = NormalizeWellId(toWell);
+
+        if (!IsValidWellId(from) || !IsValidWellId(to))
+            throw new ArgumentException($"Invalid well range: {fromWell} to {toWell}");
+
+        int fromRowIdx = Array.IndexOf(Rows, from[0]);
+        int toRowIdx   = Array.IndexOf(Rows, to[0]);
+        int fromCol    = int.Parse(from[1..]);
+        int toCol      = int.Parse(to[1..]);
+
+        if (fromRowIdx < 0 || toRowIdx < 0 || fromCol < MinColumn || toCol > MaxColumn)
+            throw new ArgumentException($"Well out of range: {fromWell} or {toWell}");
+
+        if (fromRowIdx > toRowIdx || fromCol > toCol)
+            throw new ArgumentException($"From well {fromWell} must be above-left of to well {toWell}");
+
+        var wells = new List<string>();
+        for (int col = fromCol; col <= toCol; col++)
+            for (int rowIdx = fromRowIdx; rowIdx <= toRowIdx; rowIdx++)
+                wells.Add($"{Rows[rowIdx]}{col:D2}");
+
+        return wells;
+    }
 }

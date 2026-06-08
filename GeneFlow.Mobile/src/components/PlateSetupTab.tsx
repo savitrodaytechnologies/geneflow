@@ -36,7 +36,7 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
     const [wellForm, setWellForm] = useState({ sampleName: '', targetGene: '', sampleType: 'sample', replicateGroup: '' });
 
     // Quick fill form
-    const [qfForm, setQfForm] = useState({ fromWell: 'A01', toWell: 'A12', sampleName: '', targetGene: '', sampleType: 'sample', replicateGroup: '' });
+    const [qfForm, setQfForm] = useState({ fromWell: 'A01', toWell: 'H12', sampleName: '', targetGene: '', sampleType: 'sample', replicateGroup: '', fillByColumn: true });
 
     const openWell = (well: PlateWellDto) => {
         setSelectedWell(well);
@@ -110,63 +110,63 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
             {view === 'grid' ? (
                 /* 8×12 Grid View */
                 <div style={{ overflowX: 'auto', padding: '8px 12px', display: 'flex', justifyContent: 'center' }}>
-                <div style={{ display: 'inline-block' }}>
-                    {/* Column headers */}
-                    <div style={{ display: 'flex', marginLeft: 22, marginBottom: 2 }}>
-                        {Array.from({ length: 12 }, (_, i) => (
-                            <div key={i} style={{ width: 28, textAlign: 'center', fontSize: 9, color: 'var(--ion-color-medium)', flexShrink: 0 }}>
-                                {i + 1}
+                    <div style={{ display: 'inline-block' }}>
+                        {/* Column headers */}
+                        <div style={{ display: 'flex', marginLeft: 22, marginBottom: 2 }}>
+                            {Array.from({ length: 12 }, (_, i) => (
+                                <div key={i} style={{ width: 28, textAlign: 'center', fontSize: 9, color: 'var(--ion-color-medium)', flexShrink: 0 }}>
+                                    {i + 1}
+                                </div>
+                            ))}
+                        </div>
+                        {plate.grid.map((row, rIdx) => (
+                            <div key={rIdx} style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                                {/* Row label */}
+                                <div style={{ width: 18, fontSize: 10, color: 'var(--ion-color-medium)', flexShrink: 0, textAlign: 'center' }}>
+                                    {rows[rIdx]}
+                                </div>
+                                {row.map(well => {
+                                    const filled = !!well.sampleName;
+                                    const bg = filled ? (WELL_COLORS[well.sampleType ?? ''] ?? '#607D8B') : 'var(--ion-color-light)';
+                                    return (
+                                        <div
+                                            key={well.wellId}
+                                            onClick={() => openWell(well)}
+                                            style={{
+                                                width: 28,
+                                                height: 28,
+                                                borderRadius: '50%',
+                                                backgroundColor: well.isExcluded ? '#ccc' : bg,
+                                                border: `1px solid ${filled ? 'transparent' : 'var(--ion-color-medium)'}`,
+                                                cursor: 'pointer',
+                                                flexShrink: 0,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                opacity: well.isExcluded ? 0.4 : 1,
+                                            }}
+                                            title={`${well.wellId}: ${well.sampleName ?? 'empty'}`}
+                                        >
+                                            {filled && <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.7)' }} />}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ))}
-                    </div>
-                    {plate.grid.map((row, rIdx) => (
-                        <div key={rIdx} style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-                            {/* Row label */}
-                            <div style={{ width: 18, fontSize: 10, color: 'var(--ion-color-medium)', flexShrink: 0, textAlign: 'center' }}>
-                                {rows[rIdx]}
+                        {/* Legend */}
+                        <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
+                            {Object.entries(WELL_COLORS).map(([type, color]) => (
+                                <div key={type} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
+                                    <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: color }} />
+                                    {type}
+                                </div>
+                            ))}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
+                                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'var(--ion-color-light)', border: '1px solid var(--ion-color-medium)' }} />
+                                empty
                             </div>
-                            {row.map(well => {
-                                const filled = !!well.sampleName;
-                                const bg = filled ? (WELL_COLORS[well.sampleType ?? ''] ?? '#607D8B') : 'var(--ion-color-light)';
-                                return (
-                                    <div
-                                        key={well.wellId}
-                                        onClick={() => openWell(well)}
-                                        style={{
-                                            width: 28,
-                                            height: 28,
-                                            borderRadius: '50%',
-                                            backgroundColor: well.isExcluded ? '#ccc' : bg,
-                                            border: `1px solid ${filled ? 'transparent' : 'var(--ion-color-medium)'}`,
-                                            cursor: 'pointer',
-                                            flexShrink: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            opacity: well.isExcluded ? 0.4 : 1,
-                                        }}
-                                        title={`${well.wellId}: ${well.sampleName ?? 'empty'}`}
-                                    >
-                                        {filled && <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.7)' }} />}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ))}
-                    {/* Legend */}
-                    <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
-                        {Object.entries(WELL_COLORS).map(([type, color]) => (
-                            <div key={type} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
-                                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: color }} />
-                                {type}
-                            </div>
-                        ))}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
-                            <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'var(--ion-color-light)', border: '1px solid var(--ion-color-medium)' }} />
-                            empty
                         </div>
                     </div>
-                </div>
                 </div>
             ) : (
                 /* List View - only filled wells */
@@ -253,8 +253,8 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
                 </IonContent>
             </IonModal>
 
-            {/* Quick Fill Modal */}
-            <IonModal isOpen={showQuickFill} onDidDismiss={() => setShowQuickFill(false)} breakpoints={[0, 0.85]} initialBreakpoint={0.85}>
+            {/* Quick Fill Modal — full-screen so content scrolls above keyboard */}
+            <IonModal isOpen={showQuickFill} onDidDismiss={() => setShowQuickFill(false)} breakpoints={[0, 1]} initialBreakpoint={1}>
                 <IonHeader>
                     <IonToolbar>
                         <IonTitle>Quick Fill</IonTitle>
@@ -264,7 +264,39 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
                     </IonToolbar>
                 </IonHeader>
                 <IonContent className="ion-padding">
-                    <IonText color="medium"><p style={{ fontSize: 12, marginTop: 0 }}>Fill a range of wells with the same data.</p></IonText>
+                    {/* Fill direction */}
+                    <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ion-color-primary)', marginBottom: 6 }}>Fill Direction</div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <IonButton
+                                size="small"
+                                fill={qfForm.fillByColumn ? 'solid' : 'outline'}
+                                color="primary"
+                                onClick={() => setQfForm(f => ({ ...f, fillByColumn: true }))}
+                                style={{ flex: 1 }}
+                            >
+                                ↓ Column-wise
+                            </IonButton>
+                            <IonButton
+                                size="small"
+                                fill={!qfForm.fillByColumn ? 'solid' : 'outline'}
+                                color="primary"
+                                onClick={() => setQfForm(f => ({ ...f, fillByColumn: false }))}
+                                style={{ flex: 1 }}
+                            >
+                                → Row-wise
+                            </IonButton>
+                        </div>
+                        <IonText color="medium">
+                            <p style={{ fontSize: 11, margin: '4px 0 0' }}>
+                                {qfForm.fillByColumn
+                                    ? 'Fills A01→H01, then A02→H02… (column by column)'
+                                    : 'Fills A01→A12, then B01→B12… (row by row)'}
+                            </p>
+                        </IonText>
+                    </div>
+
+                    {/* Well range */}
                     <div style={{ display: 'flex', gap: 8 }}>
                         <IonItem style={{ flex: 1 }}>
                             <IonLabel position="stacked">From Well</IonLabel>
@@ -272,7 +304,7 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
                         </IonItem>
                         <IonItem style={{ flex: 1 }}>
                             <IonLabel position="stacked">To Well</IonLabel>
-                            <IonInput value={qfForm.toWell} onIonInput={e => setQfForm(f => ({ ...f, toWell: e.detail.value ?? '' }))} placeholder="A12" />
+                            <IonInput value={qfForm.toWell} onIonInput={e => setQfForm(f => ({ ...f, toWell: e.detail.value ?? '' }))} placeholder="H12" />
                         </IonItem>
                     </div>
                     <IonItem>

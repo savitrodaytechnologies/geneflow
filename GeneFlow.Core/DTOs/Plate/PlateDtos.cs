@@ -59,7 +59,9 @@ namespace GeneFlow.Core.DTOs.Plate
     public class QuickFillRequest
     {
         public string FromWell { get; set; } = string.Empty;  // e.g. "A01"
-        public string ToWell { get; set; } = string.Empty;    // e.g. "B06"
+        public string ToWell { get; set; } = string.Empty;    // e.g. "H04"
+        /// <summary>true = column-major order (A01,B01…H01,A02…) default; false = row-major (A01,A02…H12)</summary>
+        public bool FillByColumn { get; set; } = true;
         public string? SampleName { get; set; }
         public string? TargetGene { get; set; }
         public string? ReferenceGene { get; set; }

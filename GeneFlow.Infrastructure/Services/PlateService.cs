@@ -173,7 +173,9 @@ namespace GeneFlow.Infrastructure.Services
             if (experiment == null) return 0;
             if (!await _permissions.CanEditExperimentAsync(currentUserId, experiment)) return 0;
 
-            var wellIds = WellIdHelper.GenerateWellRange(request.FromWell, request.ToWell);
+            var wellIds = request.FillByColumn
+                ? WellIdHelper.GenerateWellRangeByColumn(request.FromWell, request.ToWell)
+                : WellIdHelper.GenerateWellRange(request.FromWell, request.ToWell);
             if (wellIds.Count == 0) return 0;
 
             var layout = await _db.PlateLayouts
