@@ -3,6 +3,7 @@ import {
     IonButton, IonSpinner, IonItem, IonLabel, IonInput, IonSelect,
     IonSelectOption, IonModal, IonHeader, IonToolbar, IonTitle, IonButtons,
     IonContent, IonText, IonIcon, IonBadge, IonSegment, IonSegmentButton,
+    IonRadioGroup, IonRadio,
     useIonToast,
 } from '@ionic/react';
 import { gridOutline, listOutline, flashOutline } from 'ionicons/icons';
@@ -29,6 +30,7 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
     const [presentToast] = useIonToast();
 
     const [view, setView] = useState<'grid' | 'list'>('grid');
+    const [listSort, setListSort] = useState<'column' | 'row'>('column');
     const [selectedWell, setSelectedWell] = useState<PlateWellDto | null>(null);
     const [showQuickFill, setShowQuickFill] = useState(false);
 
@@ -171,12 +173,35 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
             ) : (
                 /* List View - only filled wells */
                 <div style={{ padding: '4px 8px' }}>
+                    {/* List sort toggle */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 4px 8px' }}>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ion-color-primary)', whiteSpace: 'nowrap' }}>Sort:</span>
+                        <IonRadioGroup
+                            value={listSort}
+                            onIonChange={e => setListSort(e.detail.value)}
+                            style={{ display: 'flex', gap: 16 }}
+                        >
+                            <IonItem lines="none" style={{ '--min-height': '28px', '--padding-start': '0', '--inner-padding-end': '0' }}>
+                                <IonRadio value="column" slot="start" style={{ marginRight: 6 }} />
+                                <IonLabel style={{ fontSize: 13 }}>↓ Column (A01,B01…)</IonLabel>
+                            </IonItem>
+                            <IonItem lines="none" style={{ '--min-height': '28px', '--padding-start': '0', '--inner-padding-end': '0' }}>
+                                <IonRadio value="row" slot="start" style={{ marginRight: 6 }} />
+                                <IonLabel style={{ fontSize: 13 }}>→ Row (A01,A02…)</IonLabel>
+                            </IonItem>
+                        </IonRadioGroup>
+                    </div>
                     {plate.grid.flat().filter(w => w.sampleName).length === 0 ? (
                         <div style={{ textAlign: 'center', padding: 24, color: 'var(--ion-color-medium)' }}>
                             No wells filled yet. Use Quick Fill or tap a well in Grid view.
                         </div>
                     ) : (
-                        plate.grid.flat().filter(w => w.sampleName).map(well => (
+                        (() => {
+                            const filled = plate.grid.flat().filter(w => w.sampleName);
+                            const sorted = listSort === 'column'
+                                ? [...filled].sort((a, b) => a.colIndex !== b.colIndex ? a.colIndex - b.colIndex : a.rowIndex - b.rowIndex)
+                                : filled; // already row-major from grid.flat()
+                            return sorted.map(well => (
                             <IonItem
                                 key={well.wellId}
                                 button
@@ -205,7 +230,8 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
                                 {well.isExcluded && <IonBadge color="medium" slot="end">Excluded</IonBadge>}
                                 {well.ctValue != null && <IonBadge color="tertiary" slot="end">Ct {well.ctValue}</IonBadge>}
                             </IonItem>
-                        ))
+                        ));
+                        })()
                     )}
                 </div>
             )}
@@ -266,34 +292,26 @@ const PlateSetupTab: React.FC<Props> = ({ experimentId, experiment }) => {
                 <IonContent className="ion-padding">
                     {/* Fill direction */}
                     <div style={{ marginBottom: 12 }}>
-                        <div style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ion-color-primary)', marginBottom: 6 }}>Fill Direction</div>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                            <IonButton
-                                size="small"
-                                fill={qfForm.fillByColumn ? 'solid' : 'outline'}
-                                color="primary"
-                                onClick={() => setQfForm(f => ({ ...f, fillByColumn: true }))}
-                                style={{ flex: 1 }}
-                            >
-                                ↓ Column-wise
-                            </IonButton>
-                            <IonButton
-                                size="small"
-                                fill={!qfForm.fillByColumn ? 'solid' : 'outline'}
-                                color="primary"
-                                onClick={() => setQfForm(f => ({ ...f, fillByColumn: false }))}
-                                style={{ flex: 1 }}
-                            >
-                                → Row-wise
-                            </IonButton>
-                        </div>
-                        <IonText color="medium">
-                            <p style={{ fontSize: 11, margin: '4px 0 0' }}>
-                                {qfForm.fillByColumn
-                                    ? 'Fills A01→H01, then A02→H02… (column by column)'
-                                    : 'Fills A01→A12, then B01→B12… (row by row)'}
-                            </p>
-                        </IonText>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--ion-color-primary)', marginBottom: 4 }}>Fill Direction</div>
+                        <IonRadioGroup
+                            value={qfForm.fillByColumn ? 'column' : 'row'}
+                            onIonChange={e => setQfForm(f => ({ ...f, fillByColumn: e.detail.value === 'column' }))}
+                        >
+                            <IonItem lines="none" style={{ '--min-height': '36px', '--padding-start': '0' }}>
+                                <IonRadio value="column" slot="start" style={{ marginRight: 8 }} />
+                                <IonLabel>
+                                    <span style={{ fontSize: 14 }}>↓ Column-wise</span>
+                                    <p style={{ fontSize: 11 }}>A01,B01…H01 → A02,B02…H02</p>
+                                </IonLabel>
+                            </IonItem>
+                            <IonItem lines="none" style={{ '--min-height': '36px', '--padding-start': '0' }}>
+                                <IonRadio value="row" slot="start" style={{ marginRight: 8 }} />
+                                <IonLabel>
+                                    <span style={{ fontSize: 14 }}>→ Row-wise</span>
+                                    <p style={{ fontSize: 11 }}>A01,A02…A12 → B01,B02…B12</p>
+                                </IonLabel>
+                            </IonItem>
+                        </IonRadioGroup>
                     </div>
 
                     {/* Well range */}
